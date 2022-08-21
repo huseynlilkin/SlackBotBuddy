@@ -3,13 +3,26 @@ import requests
 import AI
 import os
 
+auth_token = os.environ.get('SLACK_TOKEN')
+header = {'Authorization': f'Bearer {auth_token}'}
+
+
+class Slack:
+    GET_CONVERSATION = 'https://www.slack.com/api/conversations.replies'
+    POST_RESPONSE = 'https://www.slack.com/api/chat.postMessage'
+
+
+def get_conversation(payload):
+    params = {
+        'channel': payload['channel'],
+        'thread_ts': payload['ts']
+    }
+    converstation = requests.post(Slack.GET_CONVERSATION, params=params, headers=header)
+    print(f"Converstation: {converstation}")
+
 
 def lambda_handler(event, context):
     print(f'event: {event} type: {type(event)}')
-
-    url = 'https://www.slack.com/api/chat.postMessage'
-    auth_token = os.environ.get('SLACK_TOKEN')
-    header = {'Authorization': f'Bearer {auth_token}'}
 
     for record in event['Records']:
         print(f'Record: {record}')
@@ -20,6 +33,7 @@ def lambda_handler(event, context):
             print(f"request message to openai is: {payload['text']}")
             # response = AI.get_formatted_response(payload['text'])
 
+            get_conversation(payload)
             response = AI.mock_code_response()
 
             print("Creating response")
@@ -29,7 +43,7 @@ def lambda_handler(event, context):
                 "thread_ts": payload['ts']
             }
 
-            requests.post(url, json=data, headers=header)
+            requests.post(Slack.POST_RESPONSE, json=data, headers=header)
 
     return {
         'statusCode': 200
