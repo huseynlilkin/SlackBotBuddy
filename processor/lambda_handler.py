@@ -18,7 +18,9 @@ def lambda_handler(event, context):
 
         if payload.get('client_msg_id', None) is not None and payload['type'] == 'message':
             print(f"request message to openai is: {payload['text']}")
-            response = AI.get_formatted_response(payload['text'])
+            # response = AI.get_formatted_response(payload['text'])
+
+            response = AI.mock_code_response()
 
             print("Creating response")
             data = {

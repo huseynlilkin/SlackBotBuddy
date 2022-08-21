@@ -24,3 +24,8 @@ def get_formatted_response(message):
     print(f"OpenAI response: {json.dumps(response)}")
 
     return f"```{response['choices'][0]['text'].strip()}```"
+
+
+def mock_code_response():
+    message = "\n\nwindow = 3\n\nl = [1, 2, 3, 4, 5, 6, 7, 8, 9]\n\nfor i in range(len(l) - window + 1):\n\nprint(l[i:i+window])"
+    return f"```{message.strip()}```"
