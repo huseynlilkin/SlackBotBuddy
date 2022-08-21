@@ -12,13 +12,28 @@ class Slack:
     POST_RESPONSE = 'https://www.slack.com/api/chat.postMessage'
 
 
+def merge_all_messages(messages):
+    combined_msg = ''
+    for message in messages:
+        # print(message['text'])
+        combined_msg += message['text'].strip().replace('```', '').replace('\n\n', '\n') + '\n\n'
+
+    print(f"Message: {combined_msg}")
+    return combined_msg
+
+
 def get_conversation(payload):
-    params = {
-        'channel': payload['channel'],
-        'thread_ts': payload['ts']
-    }
-    converstation = requests.post(Slack.GET_CONVERSATION, params=params, headers=header)
-    print(f"Converstation: {converstation}")
+    if payload.get('thread_ts', None) is None:
+        print(f"This is the first message in the thread")
+        return payload['text']
+    else:
+        params = {
+            'channel': payload['channel'],
+            'thread_ts': payload['thread_ts']
+        }
+        converstation = requests.post(Slack.GET_CONVERSATION, params=params, headers=header)
+        data = converstation.json()
+        return merge_all_messages(data['messages'])
 
 
 def lambda_handler(event, context):
@@ -31,10 +46,9 @@ def lambda_handler(event, context):
 
         if payload.get('client_msg_id', None) is not None and payload['type'] == 'message':
             print(f"request message to openai is: {payload['text']}")
-            # response = AI.get_formatted_response(payload['text'])
-
-            get_conversation(payload)
-            response = AI.mock_code_response()
+            text = get_conversation(payload)
+            response = AI.get_formatted_response(text)
+            # response = AI.mock_code_response()
 
             print("Creating response")
             data = {
