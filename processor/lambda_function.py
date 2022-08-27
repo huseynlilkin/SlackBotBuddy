@@ -29,7 +29,7 @@ def get_conversation(payload):
     else:
         params = {
             'channel': payload['channel'],
-            'thread_ts': payload['thread_ts']
+            'ts': payload['thread_ts']
         }
         converstation = requests.post(Slack.GET_CONVERSATION, params=params, headers=header)
         data = converstation.json()
