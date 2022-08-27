@@ -19,8 +19,7 @@ def get_openai_response(message):
     return response
 
 
-def get_formatted_response(message):
-    response = get_openai_response(message)
+def get_formatted_response(response):
     print(f"OpenAI response: {json.dumps(response)}")
 
     return f"```{response['choices'][0]['text'].strip()}```"

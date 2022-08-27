@@ -24,7 +24,6 @@ def merge_all_messages(messages):
 
 def get_conversation(payload):
     if payload.get('thread_ts', None) is None:
-        print(f"This is the first message in the thread")
         return payload['text']
     else:
         params = {
@@ -40,19 +39,17 @@ def lambda_handler(event, context):
     print(f'event: {event} type: {type(event)}')
 
     for record in event['Records']:
-        print(f'Record: {record}')
-        payload = json.loads(record['body'])['event']
-        print(f'Payload: {payload}')
+        body = json.loads(record['body'])
+        payload = body['event']
 
         if payload.get('client_msg_id', None) is not None and payload['type'] == 'message':
-            print(f"request message to openai is: {payload['text']}")
             text = get_conversation(payload)
-            response = AI.get_formatted_response(text)
+            response = AI.get_openai_response(text)
+            response_text = AI.get_formatted_response(response)
             # response = AI.mock_code_response()
 
-            print("Creating response")
             data = {
-                "text": response,
+                "text": response_text,
                 "channel": payload['channel'],
                 "thread_ts": payload['ts']
             }
