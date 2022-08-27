@@ -39,7 +39,7 @@ def save_msg_with_response(payload, response):
         "open_ai_usage": response['usage']
     }
 
-    table.put(Item=item)
+    table.put_item(Item=item)
 
 
 def get_conversation(payload):
