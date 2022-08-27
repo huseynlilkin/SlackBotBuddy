@@ -1,4 +1,5 @@
 import json
+import boto3
 import requests
 import AI
 import os
@@ -20,6 +21,25 @@ def merge_all_messages(messages):
 
     print(f"Message: {combined_msg}")
     return combined_msg
+
+
+def save_msg_with_response(payload, response):
+    client = boto3.resource('dynamodb')
+    table = client.Table("messageDataWithResponse")
+
+    p_event = payload['event']
+
+    item = {
+        "event_id": payload['event_id'],
+        "type": p_event.get('type', "Input message type is not available"),
+        "text": p_event['text'],
+        "ts": p_event['ts'],
+        "thread_ts": p_event.get('thread_ts', None),
+        "open_ai_response": response['choices'][0]['text'],
+        "open_ai_usage": response['usage']
+    }
+
+    table.put(Item=item)
 
 
 def get_conversation(payload):
@@ -53,6 +73,11 @@ def lambda_handler(event, context):
                 "channel": payload['channel'],
                 "thread_ts": payload['ts']
             }
+            try:
+                save_msg_with_response(body, response)
+            except Exception as e:
+                print(f"Unable to write data to DynamoDB")
+                print(e)
 
             requests.post(Slack.POST_RESPONSE, json=data, headers=header)
 
