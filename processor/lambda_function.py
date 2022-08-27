@@ -31,6 +31,7 @@ def save_msg_with_response(payload, response):
 
     item = {
         "event_id": payload['event_id'],
+        "channel": p_event['channel'],
         "type": p_event.get('type', "Input message type is not available"),
         "text": p_event['text'],
         "ts": p_event['ts'],
