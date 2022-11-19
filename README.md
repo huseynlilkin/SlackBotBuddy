@@ -4,7 +4,8 @@ It was built on top AWS Lambda and SQS services.
 
 ## Planned features
 1. Option to format output as markdown
-2. Follow conversation below thread
+2. ~Follow conversation below thread~
+3. Add OpenAI Dall-E integration
 
 ## Requirements
 ```
